@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 
 
 import java.util.ArrayList;
+import  java.util.Arrays;
 
 public class BlockActivity extends AppCompatActivity implements  View.OnClickListener {
 
@@ -40,8 +42,13 @@ public class BlockActivity extends AppCompatActivity implements  View.OnClickLis
     Button button2;
     Button button3;
     Button button4;
+    Button button5;
+    TextView txt;
 
     DBHelper dbHelper;
+
+    boolean viewContactList = false;
+    boolean viewBlockedList = false;
 
     SQLiteDatabase database;
 
@@ -73,6 +80,11 @@ public class BlockActivity extends AppCompatActivity implements  View.OnClickLis
 
         button4 = (Button) findViewById(R.id.button3);
         button4.setOnClickListener(this);
+
+        button5 = (Button) findViewById(R.id.button5);
+        button5.setOnClickListener(this);
+
+        txt = (TextView)findViewById(R.id.textView);
 
         phonesList = (ListView) findViewById(R.id.phonesList);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, phones);
@@ -160,7 +172,21 @@ public class BlockActivity extends AppCompatActivity implements  View.OnClickLis
             case R.id.button2:
                 contentValues.put(DBHelper.PHONE_NUMBER,phone);
                 database.insert(DBHelper.TABLE_CONTACTS,null,contentValues);
+                //txt.append(selectedPhones);
 
+                for(int i=0; i< selectedPhones.size();i++)
+                {
+                    phone = selectedPhones.get(i);
+                    String[] words = phone.split("\\+");
+                    txt.append(words[words.length-1]+"\n");
+
+                    contentValues.put(DBHelper.PHONE_NUMBER,words[words.length-1]);
+                    database.insert(DBHelper.TABLE_CONTACTS,null,contentValues);
+
+                    /*deleteTitle(phone);
+                    adapter.remove(selectedPhones.get(i));*/
+
+                }
                 if(!phone.isEmpty() && phones.contains(phone)==false)
                 {
                     adapter.setNotifyOnChange(true);
@@ -192,35 +218,49 @@ public class BlockActivity extends AppCompatActivity implements  View.OnClickLis
 
             ///button Show
             case R.id.button4:
-                /*Cursor cursor = database.query(DBHelper.TABLE_CONTACTS,null,null,null,null,null,null);
-
-                if(cursor.moveToFirst())
+                viewContactList = !viewContactList;
+                if(viewContactList)
                 {
-                    int phoneIndex = cursor.getColumnIndex(DBHelper.PHONE_NUMBER);
-                    do {
-                        String phoneNum = cursor.getString(phoneIndex);
-                        adapter.add(phoneNum);
-                    }while(cursor.moveToNext());
-                }
-                cursor.close();*/
-                Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[] {ContactsContract.CommonDataKinds.Phone._ID, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
-                startManagingCursor(cursor);
-
-                if (cursor.getCount() > 0)
-                {
-                    int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                    int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-                    while (cursor.moveToNext())
+                    Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[] {ContactsContract.CommonDataKinds.Phone._ID, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+                    startManagingCursor(cursor);
+                    if (cursor.getCount() > 0)
                     {
-                        String phoneNum = cursor.getString(phoneIndex);
-                        String phoneName = cursor.getString(nameIndex);
-                        // process them as you want
-                        adapter.add(phoneName+" "+ phoneNum);
-                        Log.i("DATA"," ID "+cursor.getString(0)+" NAME "+cursor.getString(1)+" PHONE "+cursor.getString(2));
+                        int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                        int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                        while (cursor.moveToNext())
+                        {
+                            String phoneNum = cursor.getString(phoneIndex);
+                            String phoneName = cursor.getString(nameIndex);
+                            // process them as you want
+                            adapter.add(phoneName+" "+ phoneNum);
+                            Log.i("DATA"," ID "+cursor.getString(0)+" NAME "+cursor.getString(1)+" PHONE "+cursor.getString(2));
+                        }
                     }
+                    break;
                 }
-                break;
-
+                else
+                {
+                    adapter.clear();
+                }
+            case R.id.button5:
+                viewBlockedList = !viewBlockedList;
+                if(viewBlockedList)
+                {
+                    Cursor cursor = database.query(DBHelper.TABLE_CONTACTS,null,null,null,null,null,null);
+                    if(cursor.moveToFirst())
+                    {
+                        int phoneIndex = cursor.getColumnIndex(DBHelper.PHONE_NUMBER);
+                        do {
+                            String phoneNum = cursor.getString(phoneIndex);
+                            adapter.add(phoneNum);
+                        }while(cursor.moveToNext());
+                    }
+                    cursor.close();
+                }
+                else
+                {
+                    adapter.clear();
+                }
         }
 
         dbHelper.close();

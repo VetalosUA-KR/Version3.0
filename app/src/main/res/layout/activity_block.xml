@@ -11,11 +11,11 @@
 
         <EditText
             android:id="@+id/TextFields"
-            android:layout_weight="4"
-            android:layout_width="0dp"
+            android:layout_width="1dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
             android:importantForAutofill="no"
-            android:inputType="text"/>
+            android:inputType="text" />
 
         <Button
             android:id="@+id/button2"
@@ -34,14 +34,6 @@
             android:text="@string/minus" />
 
         <Button
-            android:id="@+id/button4"
-            android:layout_width="55dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onClick"
-            android:text="@string/show" />
-
-        <Button
             android:id="@+id/button1"
             android:layout_width="55dp"
             android:layout_height="wrap_content"
@@ -50,11 +42,36 @@
             android:text="@string/next"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="214dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="@string/show" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="208dp"
+            android:layout_height="wrap_content"
+            android:text="BLOCKED NUMBERS" />
+    </LinearLayout>
+
     <ListView
         android:id="@+id/phonesList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="403dp"
         android:choiceMode="multipleChoice" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="231dp" />
 
 
 </LinearLayout>
